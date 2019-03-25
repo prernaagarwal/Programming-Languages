@@ -1,0 +1,76 @@
+CS 320 Principles of Programming Languages
+Homework 3
+Due Wednesday 11/14 before class (6:40pm)
+
+
+If you work on a computer, submit a TXT or PDF file as usual.
+
+
+If you do your work on paper, submit it as a PDF file or a PNG or JPEG image.
+Make sure your handwriting is readable!
+Make sure the image is clear!
+Make sure there aren't photo editor toolbars covering part of your image!
+(It's happened before.)
+
+
+1. (4 points each)
+
+Evaluate the following lambda calculus expressions using the call-by-value
+semantics from the Week 6 slides. (In short, arguments must be evaluated before
+function applications.)
+
+Show all the steps, including the substitutions.
+
+Every expression should reduce to an integer.
+
+The \ character is used in place of a lower-case Greek lambda.
+
+Vim tip: if you put your cursor over a left or right parenthesis in normal
+mode and type "v%" (without quotes), it'll highlight the text between that
+parenthesis and the matching one.
+
+  a) ((\x. (\y. x)) 1) (2 + 3) =>
+     ((\x. (\y. x)) 1) 5 =>
+     ((\y. x)[1/x]) 5 = (\y. 1) 5 =>
+     1[5/y] = 1
+
+
+  b) if ((\x. true) 5) then (6 + 7) else false =>
+     if true[5/x] then (6 + 7) else false = if true then (6 + 7) else false =>
+     6 + 7 =>
+     13
+
+  c) (\f. (f (f 1))) (\x. x + 1) =>
+     (f (f 1))[(\x. x + 1)/f] = (\x. x + 1) ((\x. x + 1) 1) =>
+     (\x. x + 1) (x + 1)[1/x] = (\x. x + 1) (1 + 1) =>
+     (\x. x + 1) 2 =>
+     (x + 1)[2/x] = 2 + 1 =>
+     3
+
+
+
+2. (4 points)
+
+Show that this lambda calculus expression diverges (never finishes evaluating)
+by reducing it until the evaluation process loops - i.e. until you take
+a reduction step that results in an expression you've already seen.
+
+  (\y. (y y)) ((\x. x) (\y. (y y))) =>
+  (\y. (y y)) (x[(\y. (y y))/x]) = (\y. (y y)) (\y. (y y)) =>
+  (y y)[(\y. (y y))/y] = (\y. (y y)) (\y. (y y))
+
+
+
+3. (4 points)
+
+Describe in your own words how reduction order can affect whether or not a
+lambda calculus expression diverges during evaluation. (Look for the
+discussion of reduction order and divergence in the Week 6 slides.)
+
+  When evaluating a function application, if a nonterminating argument to the
+  function is not used in the function body, strict evaluation will diverge and
+  lazy evaluation will not diverge.
+
+
+
+Questions 4-7 are in hw3.lhs.

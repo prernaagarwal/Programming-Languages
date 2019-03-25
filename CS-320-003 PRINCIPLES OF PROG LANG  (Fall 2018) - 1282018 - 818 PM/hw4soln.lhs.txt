@@ -1,0 +1,118 @@
+This line turns on an optional GHCi warning that'll be useful in this assignment.
+
+{-# options -fwarn-incomplete-patterns #-}
+
+> module HW4 where
+
+
+Here's the example of an HTTP request type from the Week 8 slides.
+
+
+An (oversimplified) HTTP request is one of the following:
+- a “GET request” containing a URL
+- a “POST request” containing a URL and a body of text (a string)
+- a “LINK request” containing two URLs
+
+
+In STLC:
+
+  URL | (URL, String) | (URL, URL)
+
+
+In Haskell:
+
+  data Req = Get URL | Post URL String | Link URL URL
+
+
+Instead of using "left" and "right" to construct expressions of a tagged union type,
+we give a _constructor name_ for each type in the union: Get, Post, and Link.
+
+
+Here's a data type that represents a numeric value of some type:
+an Int, a Float, or a Double.
+
+> data Numeric = NumInt Int | NumFloat Float | NumDouble Double
+
+
+"NumInt", "NumFloat", and "NumDouble" are the constructor names.
+(Check their types with :t in GHCi.)
+
+In Haskell, every constructor name in a program must be unique.
+
+
+We can use these constructor names in case/of expressions.
+Here's a function in lambda syntax that adds 1 to a Numeric value.
+
+> plusOne :: Numeric -> Numeric
+> plusOne =
+>   \x ->
+>     case x of {
+>       NumInt i -> NumInt (i + 1) ;
+>       NumFloat f -> NumFloat (f + 1) ;
+>       NumDouble d -> NumDouble (d + 1) }
+
+The curly braces and semicolons are optional in Haskell.
+
+> plusOne' :: Numeric -> Numeric
+> plusOne' =
+>   \x ->
+>     case x of
+>       NumInt i -> NumInt (i + 1)
+>       NumFloat f -> NumFloat (f + 1)
+>       NumDouble d -> NumDouble (d + 1)
+
+
+
+4. (3 points each, 9 total)
+
+Give a Haskell data type definition for each of the following types.
+(Add = and some constructors after each one.)
+
+Try to come up with constructor names that make sense.
+
+a) A JSON value is an Int, a String, or a Float.
+   (Real JSON values have more cases - just do these three.)
+
+> data JSON = JSONInt Int | JSONString String | JSONFloat Float
+
+
+b) A user ID is either a String or two Ints.
+
+> data UserID = IDString String | IDInts Int Int
+
+
+c) An audio stream is either a String (a file name)
+   or a list of Floats (a stream of bytes).
+
+   (The type of a list of elements of type A is written [A].)
+
+> data AudioStream = FileStream String | ByteStream [Float]
+
+
+
+5. (3 points each, 6 total)
+
+Define a function in lambda syntax for each of the following descriptions,
+using the data types you defined in question 4.
+
+
+a) jsonToString converts any JSON value into a JSON string value.
+   (The built-in function "show" can convert an Int or Float to a String.)
+
+> jsonToString :: JSON -> JSON
+> jsonToString =
+>   \json -> case json of
+>     JSONInt int -> JSONString (show int)
+>     JSONString str -> JSONString str
+>     JSONFloat flt -> JSONString (show flt)
+
+
+b) userIdToJson converts a UserID value to a JSON value.
+   If the UserID is a String, it becomes a JSON String value.
+   If the UserID is two Ints, it becomes a JSON Int value: the sum of the two Ints.
+
+> userIdToJson :: UserID -> JSON
+> userIdToJson =
+>   \userid -> case userid of
+>     IDString str -> JSONString str
+>     IDInts int1 int2 -> JSONInt (int1 + int2)

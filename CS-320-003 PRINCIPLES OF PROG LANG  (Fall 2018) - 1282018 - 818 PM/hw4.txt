@@ -1,0 +1,151 @@
+CS 320 Principles of Programming Languages
+Homework 4
+Due Monday 11/26 before class (6:40pm)
+
+
+There are 50 required points on this homework:
+35 in this file, and 15 in hw4.lhs.
+
+There are also 30 extra credit points.
+
+
+If you do all of the extra credit, you'll be really sick of
+proof theory and type theory by the end of it. This is by design.
+
+Writing proofs and type derivations by hand is _tedious_.
+There's not much complexity, but there's a lot of painful bookkeeping.
+
+In the real world, we use programs to write proofs and type derivations for us.
+It's way less tedious that way.
+
+To really understand how those programs work, though, it's necessary to work
+through several examples by hand.
+
+Once you've reached a point where that's boring instead of confusing,
+you'll have a much better sense of how to automate the process.
+
+Understanding how typecheckers work is incredibly useful when you're using
+statically-typed languages, which show up everywhere.
+
+That's the real point of these exercises.
+
+
+
+1. (2 points each, 6 total)
+
+Give a proof of each of the following propositions.
+Reference slide 42 from week 7 for the proof theory rules.
+
+If you do your proofs on paper (which is probably easiest),
+submit them as PDFs or standard image files (PNG or JPEG).
+Make sure they're readable!
+
+Each of these should take up less than a page of paper,
+but leave yourself plenty of room when you start a proof.
+
+a) [] |- A -> (B -> (B /\ A))
+b) [] |- (A \/ A) -> A
+c) [A] |- (A -> B) -> B
+
+
+Extra credit (2 points each, 10 total):
+
+Write some string here that you're sure nobody else will choose.
+Your name is probably a good choice.
+The string doesn't need to be within quotes.
+The string can be as long as you want.
+Use only letters and numbers and spaces.
+
+  <your string here>
+
+Download `Logic.hs` from the Haskell folder on D2L.
+In your terminal, run `ghc Logic.hs` to compile the program.
+Now run `./Logic <your string here>` with your string (no quotes, spaces are fine).
+After a couple minutes, it should print out five propositions.
+These are generated from the string you put in, and they should all be provable.
+You can give proofs of any of these in an empty context for extra credit.
+You'll get two points for each one you prove - you don't have to prove all of them.
+
+But wait!
+If you don't like the propositions you get, you can try a different string.
+
+YOU WILL ONLY GET POINTS IF all of the propositions you prove come from the
+string you wrote in this file, and nobody else used the exact same string.
+
+If you use a different string than a friend and some of the propositions
+you get are the same, that's fine. (It should be unlikely, though.)
+
+These propositions should all be _very approximately_ equally hard to prove.
+Some might be a bit easier or harder than others.
+I make no promises about how much paper they'll require.
+
+DO NOT CHANGE THE CONTENTS OF Logic.hs.
+
+If you want to try to reverse engineer Logic.hs and write a program to give you
+the answers, go for it. (This is very hard but not impossible given what we've
+covered about Haskell and proof theory.) If you do, turn in the program with
+your homework submission.
+
+
+2. (3 points each, 9 total)
+
+Give a type derivation for each of the following expressions.
+Reference slide 48 from week 8 for the type theory rules.
+
+a) [] |- \x. \y. (y, x) : A -> (B -> (B, A))
+b) [] |- \x. case x of { left y -> y ; right z -> z } : (A | A) -> A
+c) [x : A] |- \f. f x : (A -> B) -> B
+
+
+Extra credit (4 points each, 20 total)
+
+Follow the instructions for the extra credit on question 1.
+(Use the same string you used for that one.)
+Translate each of the five propositions to a type. (1 point each)
+Give an expression of each type. (1 point each)
+Give a type derivation for each expression under an empty context. (2 points each)
+
+Fair warning: some of these extra credit type derivations might take up tons of space.
+
+
+3. (20 points total)
+
+At each of the five commented lines in the following procedural program:
+  - Write out the contents of the type environment during typechecking.
+    (2 points each)
+
+  - Write out the contents of the evaluation environment (the stack) during
+    evaluation for each time the line is hit during execution, assuming
+    execution starts with main().
+    (2 points each)
+
+    Reference the week 9 slides for the rules of procedural typechecking and evaluation.
+
+num distance(num x, num y) {
+  bool b = x < y;
+  num d = 0;
+  // 1
+
+  if b {
+    num z = y - x;
+    d = z;
+    // 2
+  } else {
+    num w = x - y;
+    d = w;
+    // 3
+  }
+
+  // 4
+  return d;
+}
+
+unit main() {
+  num x = 1;
+  num y = distance(3, x);
+  num z = distance(x, y);
+  // 5
+}
+
+
+Questions 4 and 5 are in hw4.lhs.

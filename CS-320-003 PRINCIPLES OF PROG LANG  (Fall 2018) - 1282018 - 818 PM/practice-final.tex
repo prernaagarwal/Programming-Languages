@@ -1,0 +1,981 @@
+\documentclass[12pt]{article}
+
+\usepackage{amsmath}
+\usepackage{bussproofs}
+\usepackage[shortlabels]{enumitem}
+\usepackage[margin=0.5in]{geometry}
+\usepackage{lscape}
+
+\pagenumbering{gobble}
+
+\begin{document}
+
+\section{}
+Normalize the following lambda calculus expressions using call-by-value reduction, showing every step (including substitutions).
+
+\begin{enumerate}[label=\alph*)]
+  \item $((1 + 2) * 3) + (4 * 5)$
+  \item $((\lambda x.\ x)\ (\lambda y.\ y))\ ((\lambda x.\ x)\ (\lambda z.\ z))$
+  \item $((\lambda x.\ (\lambda y.\ (x * y) + x))\ 2)\ 3$
+  \item $((\lambda f.\ (\lambda a.\ (f\ 1)\ a))\ (\lambda x.\ (\lambda y.\ y + x)))\ 2$
+\end{enumerate}
+
+
+\section{}
+Give proofs of the following propositional judgements in intuitionistic proof theory.
+
+\begin{enumerate}[label=\alph*)]
+  \item $[] \vdash A \to (B \to (C \to (C \wedge (A \wedge B))))$
+  \item $[] \vdash (A \wedge B) \to ((A \to (B \to C)) \to C)$
+  \item $[] \vdash (A \vee B) \to ((A \to C) \to ((B \to C) \to C))$
+  \item $[] \vdash (A \to B) \to ((B \to C) \to (A \to C))$
+\end{enumerate}
+
+
+\section{}
+Give type derivations for the following type judgements in simply-typed lambda calculus.
+
+\begin{enumerate}[label=\alph*)]
+  \item $[x : Bool] \vdash \texttt{if}\ x\ \texttt{then}\ (\lambda y.\ y + 1)\ \texttt{else}\ (\lambda y.\ y - 1) : \texttt{Num} \to \texttt{Num}$
+  \item $[] \vdash (\lambda x.\ (\lambda y.\ x + y))\ 1 : \texttt{Num} \to \texttt{Num}$
+  \item $[] \vdash \texttt{let}\ (a, b) = ((1 + 1), 2)\ \texttt{in}\ a < b : \texttt{Bool}$
+  \item $[] \vdash \lambda v.\ \texttt{case}\ v\ \texttt{of}\ \{\ \texttt{left}\ v_1 \to \texttt{true}\ |\ \texttt{right}\ v_2 \to v_2 \} : (P\ |\ \texttt{Bool}) \to \texttt{Bool}$
+\end{enumerate}
+
+\pagebreak
+
+\section{}
+
+\begin{enumerate}[label=\alph*)]
+  \item Write out the type context at each numbered line.
+  \item Write out the evaluation environment (the stack of activation frames) each time a numbered line is hit during execution, starting in \texttt{main}.
+\end{enumerate}
+
+\bigskip
+
+\begin{verbatim}
+  Num plusOrMinus(x: Bool, y: Num) {
+    Num m = 0;
+
+    if x {
+      Num n = m;
+      n = y + 1;
+      m = n;
+      // 1
+    } else {
+      m = y - 1;
+      // 2
+    }
+
+    // 3
+
+    return m;
+  }
+ 
+  Num doNothing(a: Num) {
+    Num b = plusOrMinus(true, a);
+    // 4
+    Num c = plusOrMinus(false, b);
+    // 5
+    return c;
+  }
+ 
+  Unit main() {
+    Num u = doNothing(3);
+    // 6
+  }
+\end{verbatim}
+
+\pagebreak
+
+\section*{Lambda calculus syntax rules}
+
+Where $x$ is a variable name:
+
+\bigskip
+
+\begin{center}
+  \begin{tabular}{r c l}
+    $b$ & $::=$ &     $\texttt{true}\ |\ \texttt{false}$\\
+    \\
+    $n$ & $::=$ &     $\dots\ |\ -3\ |\ -2\ |\ -1\ |\ 0\ |\ 1\ |\ 2\ |\ \dots$\\
+    \\
+    $e$ & $::=$ & $x\ |\ (\lambda x.\ e)\ |\ (e_1\ e_2)$\\
+        &$\vert$& $n\ |\ (e_1 + e_2)\ |\ (e_1 - e_2)\ | (e_1 * e_2)\ |\ (e_1 < e_2)$\\
+        &$\vert$& $b\ |\ \texttt{if}\ e_1\ \texttt{then}\ e_2\ \texttt{else}\ e_3$\\
+        &$\vert$& $(e_1, e_2)\ |\ \texttt{let}\ (x_1, x_2) = e_1\ \texttt{in}\ e_2$\\
+        &$\vert$& $\texttt{left}\ e\ |\ \texttt{right}\ e\ |\ \texttt{case}\ e_1\ \texttt{of}\ \{\ \texttt{left}\ x_1 \to e_2\ |\ \texttt{right}\ x_2 \to e_3\ \}$\\
+    \\
+    $v$ & $::=$ & $b\ |\ n\ |\ (\lambda x.\ e)\ |\ (v_1, v_2)\ |\ \texttt{left}\ v\ |\ \texttt{right}\ v$
+  \end{tabular}
+\end{center}
+
+\vfill
+
+\section*{Lambda calculus call-by-value reduction rules}
+
+The premises of the rules Add, Sub, Mult, Less, and NotLess should be read as statements about integers that are satisfied when the statement is true in standard arithmetic.
+
+\begin{center}
+  \vfill
+
+  \AxiomC{$e_1 \Rightarrow e_1'$}
+  \RightLabel{AppL}
+  \UnaryInfC{$(e_1\ v_2) \Rightarrow (e_1'\ v_2)$}
+  \DisplayProof
+  \ \hspace{2em}
+  \AxiomC{$e_2 \Rightarrow e_2'$}
+  \RightLabel{AppR}
+  \UnaryInfC{$(e_1\ e_2) \Rightarrow (e_1\ e_2')$}
+  \DisplayProof
+  \ \hspace{2em}
+  \AxiomC{}
+  \RightLabel{Beta}
+  \UnaryInfC{$(e_1\ e_2) \Rightarrow (e_1\ e_2')$}
+  \DisplayProof
+
+  \vfill
+
+  \AxiomC{$e_1 \Rightarrow e_1'$}
+  \RightLabel{AddL}
+  \UnaryInfC{$e_1 + e_2 \Rightarrow e_1' + e_2$}
+  \DisplayProof
+  \ \hspace{2em}
+  \AxiomC{$e_2 \Rightarrow e_2'$}
+  \RightLabel{AddR}
+  \UnaryInfC{$v_1 + e_2 \Rightarrow v_1 + e_2'$}
+  \DisplayProof
+  \ \hspace{2em}
+  \AxiomC{$n_1 + n_2 = n_3$}
+  \RightLabel{Add}
+  \UnaryInfC{$n_1 + n_2 \Rightarrow n_3$}
+  \DisplayProof
+
+  \vfill
+
+  \AxiomC{$e_1 \Rightarrow e_1'$}
+  \RightLabel{SubL}
+  \UnaryInfC{$e_1 - e_2 \Rightarrow e_1' - e_2$}
+  \DisplayProof
+  \ \hspace{2em}
+  \AxiomC{$e_2 \Rightarrow e_2'$}
+  \RightLabel{SubR}
+  \UnaryInfC{$v_1 - e_2 \Rightarrow v_1 - e_2'$}
+  \DisplayProof
+  \ \hspace{2em}
+  \AxiomC{$n_1 - n_2 = n_3$}
+  \RightLabel{Sub}
+  \UnaryInfC{$n_1 - n_2 \Rightarrow n_3$}
+  \DisplayProof
+
+  \vfill
+
+  \AxiomC{$e_1 \Rightarrow e_1'$}
+  \RightLabel{MultL}
+  \UnaryInfC{$e_1 * e_2 \Rightarrow e_1' * e_2$}
+  \DisplayProof
+  \ \hspace{2em}
+  \AxiomC{$e_2 \Rightarrow e_2'$}
+  \RightLabel{MultR}
+  \UnaryInfC{$v_1 * e_2 \Rightarrow v_1 * e_2'$}
+  \DisplayProof
+  \ \hspace{2em}
+  \AxiomC{$n_1 * n_2 = n_3$}
+  \RightLabel{Mult}
+  \UnaryInfC{$n_1 * n_2 \Rightarrow n_3$}
+  \DisplayProof
+
+  \vfill
+
+  \AxiomC{$e_1 \Rightarrow e_1'$}
+  \RightLabel{LessL}
+  \UnaryInfC{$e_1 < e_2 \Rightarrow e_1' < e_2$}
+  \DisplayProof
+  \ \hspace{2em}
+  \AxiomC{$e_2 \Rightarrow e_2'$}
+  \RightLabel{LessR}
+  \UnaryInfC{$v_1 < e_2 \Rightarrow v_1 < e_2'$}
+  \DisplayProof
+
+  \vfill
+
+  \AxiomC{$n_1 < n_2$}
+  \RightLabel{Less}
+  \UnaryInfC{$n_1 < n_2 \Rightarrow \texttt{true}$}
+  \DisplayProof
+  \ \hspace{2em}
+  \AxiomC{$n_1 \ge n_2$}
+  \RightLabel{NotLess}
+  \UnaryInfC{$n_1 < n_2 \Rightarrow \texttt{false}$}
+  \DisplayProof
+
+  \vfill
+\end{center}
+
+\pagebreak
+
+\begin{center}
+  \vfill
+
+  \AxiomC{$e \Rightarrow e'$}
+  \RightLabel{Left}
+  \UnaryInfC{$\texttt{left}\ e \Rightarrow \texttt{left}\ e'$}
+  \DisplayProof
+  \ \hspace{2em}
+  \AxiomC{$e \Rightarrow e'$}
+  \RightLabel{Right}
+  \UnaryInfC{$\texttt{right}\ e \Rightarrow \texttt{right}\ e'$}
+  \DisplayProof
+
+  \vfill
+
+  \AxiomC{$e_1 \Rightarrow e_1'$}
+  \RightLabel{Case}
+  \UnaryInfC{$\texttt{case}\ e_1\ \{\ \texttt{left}\ x_2 \rightarrow e_2\ |\ \texttt{right}\ x_3 \rightarrow e_3\ \} \Rightarrow \texttt{case}\ e_1'\ \{\ \texttt{left}\ x_2 \rightarrow e_2\ |\ \texttt{right}\ x_3 \rightarrow e_3\ \}$}
+  \DisplayProof
+
+  \vfill
+
+  \AxiomC{}
+  \RightLabel{CaseLeft}
+  \UnaryInfC{$\texttt{case}\ (\texttt{left}\ v_1)\ \{\ \texttt{left}\ x_2 \rightarrow e_2\ |\ \texttt{right}\ x_3 \rightarrow e_3\ \} \Rightarrow e_2[v_1/x_2]$}
+  \DisplayProof
+
+  \vfill
+
+  \AxiomC{}
+  \RightLabel{CaseRight}
+  \UnaryInfC{$\texttt{case}\ (\texttt{right}\ v_1)\ \{\ \texttt{left}\ x_2 \rightarrow e_2\ |\ \texttt{right}\ x_3 \rightarrow e_3\ \} \Rightarrow e_3[v_1/x_3]$}
+  \DisplayProof
+
+  \vfill
+
+  \AxiomC{$e_1 \Rightarrow e_1'$}
+  \RightLabel{PairLeft}
+  \UnaryInfC{$(e_1, e_2) \Rightarrow (e_1', e_2)$}
+  \DisplayProof
+  \ \hspace{3em}
+  \AxiomC{$e_2 \Rightarrow e_2'$}
+  \RightLabel{PairRight}
+  \UnaryInfC{$(v_1, e_2) \Rightarrow (v_1, e_2')$}
+  \DisplayProof
+
+  \vfill
+
+  \AxiomC{$e_1 \Rightarrow e_1'$}
+  \RightLabel{Let}
+  \UnaryInfC{$\texttt{let}\ (x_1, x_2) = e_1\ \texttt{in}\ e_2 \Rightarrow \texttt{let}\ (x_1, x_2) = e_1' \ \texttt{in}\ e_2$}
+  \DisplayProof
+
+  \vfill
+
+  \AxiomC{}
+  \RightLabel{LetPair}
+  \UnaryInfC{$\texttt{let}\ (x_1, x_2) = (v_1, v_2)\ \texttt{in}\ e_2 \Rightarrow e_2[v_1/x_1][v_2/x_2]$}
+  \DisplayProof
+
+  \vfill
+\end{center}
+
+\pagebreak
+
+\section*{Intuitionistic proof theory propositional judgement rules}
+
+The premise of the rule Ass should be read as a statement about list inclusion that is satisfied when the statement is visibly true.
+
+\begin{center}
+  \vfill
+
+  \AxiomC{$A \in \Gamma$}
+  \RightLabel{Ass}
+  \UnaryInfC{$\Gamma \vdash A$}
+  \DisplayProof
+  \ \hspace{2em}
+  \AxiomC{}
+  \RightLabel{T-Intro}
+  \UnaryInfC{$\Gamma \vdash$ T}
+  \DisplayProof
+  \ \hspace{2em}
+  \AxiomC{$\Gamma \vdash$ F}
+  \RightLabel{F-Elim}
+  \UnaryInfC{$\Gamma \vdash P$}
+  \DisplayProof
+
+  \vfill
+
+  \AxiomC{$\Gamma \vdash P$}
+  \AxiomC{$\Gamma \vdash Q$}
+  \RightLabel{$\wedge$-Intro}
+  \BinaryInfC{$\Gamma \vdash P \wedge Q$}
+  \DisplayProof
+  \ \hspace{2em}
+  \AxiomC{$\Gamma \vdash P \wedge Q$}
+  \AxiomC{$P :: Q :: \Gamma \vdash R$}
+  \RightLabel{$\wedge$-Elim}
+  \BinaryInfC{$\Gamma \vdash R$}
+  \DisplayProof
+
+  \vfill
+
+  \AxiomC{$\Gamma \vdash P$}
+  \RightLabel{$\vee_L$-Intro}
+  \UnaryInfC{$\Gamma \vdash P \vee Q$}
+  \DisplayProof
+  \ \hspace{5em}
+  \AxiomC{$\Gamma \vdash Q$}
+  \RightLabel{$\vee_R$-Intro}
+  \UnaryInfC{$\Gamma \vdash P \vee Q$}
+  \DisplayProof
+
+  \vfill
+
+  \AxiomC{$\Gamma \vdash P \vee Q$}
+  \AxiomC{$P :: \Gamma \vdash R$}
+  \AxiomC{$Q :: \Gamma \vdash R$}
+  \RightLabel{$\vee$-Elim}
+  \TrinaryInfC{$\Gamma \vdash R$}
+  \DisplayProof
+
+  \vfill
+
+  \AxiomC{$P :: \Gamma \vdash Q$}
+  \RightLabel{$\to$-Intro}
+  \UnaryInfC{$\Gamma \vdash P \to Q$}
+  \DisplayProof
+  \ \hspace{3em}
+  \AxiomC{$\Gamma \vdash P \to Q$}
+  \AxiomC{$\Gamma \vdash P$}
+  \RightLabel{$\to$-Elim}
+  \BinaryInfC{$\Gamma \vdash Q$}
+  \DisplayProof
+
+  \vfill
+\end{center}
+
+\pagebreak
+
+\section*{Simply-typed lambda calculus type judgement rules}
+
+The premise of the rule Var should be read as a statement about the list lookup operation that is satisfied when the statement is visibly true.
+
+\begin{center}
+  \vfill
+
+  \AxiomC{$\Gamma(x) = P$}
+  \RightLabel{Var}
+  \UnaryInfC{$\Gamma \vdash x : P$}
+  \DisplayProof
+  \ \hspace{3em}
+  \AxiomC{}
+  \RightLabel{Unit}
+  \UnaryInfC{$\Gamma \vdash \texttt{unit} : \texttt{Unit}$}
+  \DisplayProof
+
+  \vfill
+
+  \AxiomC{}
+  \RightLabel{Num}
+  \UnaryInfC{$\Gamma \vdash n : \texttt{Num}$}
+  \DisplayProof
+
+  \vfill
+
+  \AxiomC{$\Gamma \vdash e_1 : \texttt{Num}$}
+  \AxiomC{$\Gamma \vdash e_2 : \texttt{Num}$}
+  \RightLabel{Add}
+  \BinaryInfC{$\Gamma \vdash e_1 + e_2 : \texttt{Num}$}
+  \DisplayProof
+  \ \hspace{3em}
+  \AxiomC{$\Gamma \vdash e_1 : \texttt{Num}$}
+  \AxiomC{$\Gamma \vdash e_2 : \texttt{Num}$}
+  \RightLabel{Sub}
+  \BinaryInfC{$\Gamma \vdash e_1 - e_2 : \texttt{Num}$}
+  \DisplayProof
+
+  \vfill
+
+  \AxiomC{$\Gamma \vdash e_1 : \texttt{Num}$}
+  \AxiomC{$\Gamma \vdash e_2 : \texttt{Num}$}
+  \RightLabel{Mult}
+  \BinaryInfC{$\Gamma \vdash e_1 * e_2 : \texttt{Num}$}
+  \DisplayProof
+  \ \hspace{3em}
+  \AxiomC{$\Gamma \vdash e_1 : \texttt{Num}$}
+  \AxiomC{$\Gamma \vdash e_2 : \texttt{Num}$}
+  \RightLabel{Less}
+  \BinaryInfC{$\Gamma \vdash e_1 < e_2 : \texttt{Bool}$}
+  \DisplayProof
+
+  \vfill
+
+  \AxiomC{}
+  \RightLabel{Bool}
+  \UnaryInfC{$\Gamma \vdash b : \texttt{Bool}$}
+  \DisplayProof
+
+  \vfill
+
+  \AxiomC{$\Gamma \vdash e_1 : \texttt{Bool}$}
+  \AxiomC{$\Gamma \vdash e_2 : P$}
+  \AxiomC{$\Gamma \vdash e_3 : P$}
+  \RightLabel{If}
+  \TrinaryInfC{$\Gamma \vdash \texttt{if}\ e_1\ \texttt{then}\ e_2\ \texttt{else}\ e_3 : P$}
+  \DisplayProof
+
+  \vfill
+
+  \AxiomC{$(x : P) :: \Gamma \vdash e : Q$}
+  \RightLabel{Lambda}
+  \UnaryInfC{$\Gamma \vdash (\lambda x.\ e) : P \to Q$}
+  \DisplayProof
+  \ \hspace{3em}
+  \AxiomC{$\Gamma \vdash e_1 : P \to Q$}
+  \AxiomC{$\Gamma \vdash e_2 : P$}
+  \RightLabel{App}
+  \BinaryInfC{$\Gamma \vdash (e_1\ e_2) : Q$}
+  \DisplayProof
+
+  \vfill
+
+  \AxiomC{$\Gamma \vdash e_1 : P$}
+  \AxiomC{$\Gamma \vdash e_2 : Q$}
+  \RightLabel{Pair}
+  \BinaryInfC{$\Gamma \vdash (e_1,e_2) : (P, Q)$}
+  \DisplayProof
+  
+  \vfill
+
+  \AxiomC{$\Gamma \vdash e_1 : (P, Q)$}
+  \AxiomC{$(x : P) :: (y : Q) :: \Gamma \vdash e_2 : R$}
+  \RightLabel{Let}
+  \BinaryInfC{$\Gamma \vdash \texttt{let}\ (x,y) = e_1\ \texttt{in}\ e_2 : R$}
+  \DisplayProof
+
+  \vfill
+
+  \AxiomC{$\Gamma \vdash e : P$}
+  \RightLabel{Left}
+  \UnaryInfC{$\Gamma \vdash \texttt{left}\ e : (P | Q)$}
+  \DisplayProof
+  \ \hspace{3em}
+  \AxiomC{$\Gamma \vdash e : Q$}
+  \RightLabel{Right}
+  \UnaryInfC{$\Gamma \vdash \texttt{right}\ e : (P | Q)$}
+  \DisplayProof
+
+  \vfill
+
+  \AxiomC{$\Gamma \vdash e_1 : (P | Q)$}
+  \AxiomC{$(x_1 : P) :: \Gamma \vdash e_2 : R$}
+  \AxiomC{$(x_2 : Q) :: \Gamma \vdash e_3 : R$}
+  \RightLabel{Case}
+  \TrinaryInfC{$\Gamma \vdash \texttt{case}\ e_1\ \texttt{of}\ \{\ \texttt{left}\ x_1 \to e_2\ |\ \texttt{right}\ x_2 \to e_3\ \} : R$}
+  \DisplayProof
+
+  \vfill
+\end{center}
+
+\pagebreak
+
+\vspace*{\fill}
+
+\center{\emph{this page intentionally left blank}}
+\center{\emph{(answers start on the next page)}}
+
+\vspace*{\fill}
+
+\pagebreak
+
+\section*{1}
+
+\begin{flushleft}
+  These are \textbf{the only correct answers} to these questions.
+  \\
+  The labels on the right show which reduction rules are used in each step.
+  \\
+  \textbf{You do not have to write the names of the reduction rules in your answers on the exam, but \emph{you do have to use the correct reduction order}}.
+\end{flushleft}
+
+\begin{enumerate}[label=\alph*)]
+  \vfill
+
+  \item
+    \begin{align}
+      ((1 + 2) * 3) + (4 * 5) &\Rightarrow \tag{AddL MultL Add}\\
+      (3 * 3) + (4 * 5) &\Rightarrow \tag{AddL Mult}\\
+      9 + (4 * 5) &\Rightarrow \tag{AddR Mult}\\
+      9 + 20 &\Rightarrow \tag{Add}\\
+      29\nonumber
+    \end{align}
+
+  \vfill
+
+  \item
+    \begin{align}
+      ((\lambda x.\ x)\ (\lambda y.\ y))\ ((\lambda x.\ x)\ (\lambda z.\ z)) &\Rightarrow \tag{AppR Beta}\\
+      ((\lambda x.\ x)\ (\lambda y.\ y))\ (x[(\lambda z.\ z)/x]) &= ((\lambda x.\ x)\ (\lambda y.\ y))\ (\lambda z.\ z) \Rightarrow \tag{AppL Beta}\\
+      (x[(\lambda y.\ y)/x])\ (\lambda z.\ z) &= (\lambda y.\ y)\ (\lambda z.\ z) \Rightarrow \tag{Beta}\\
+      y[(\lambda z.\ z)/y] &= \lambda z.\ z\nonumber
+    \end{align}
+
+  \vfill
+
+  \item
+    \begin{align}
+      ((\lambda x.\ (\lambda y.\ (x * y) + x))\ 2)\ 3 &\Rightarrow \tag{AppL Beta}\\
+      ((\lambda y.\ (x * y) + x)[2/x])\ 3 &= (\lambda y.\ (2 * y) + 2)\ 3 \Rightarrow \tag{Beta} \\
+      ((2 * y) + 2)[3/y] &= (2 * 3) + 2 \Rightarrow \tag{AddL Mult}\\
+      6 + 2 &\Rightarrow \tag{Add}\\
+      8\nonumber
+    \end{align}
+
+  \vfill
+
+  \item
+    \begin{align}
+      ((\lambda f.\ (\lambda a.\ (f\ 1)\ a))\ (\lambda x.\ (\lambda y.\ y + x)))\ 2 &\Rightarrow \tag{AppL Beta}\\
+      ((\lambda a.\ (f\ 1)\ a)[(\lambda x.\ (\lambda y.\ y + x))/f])\ 2 &= (\lambda a.\ ((\lambda x.\ (\lambda y.\ y + x))\ 1)\ a)\ 2 \Rightarrow \tag{Beta}\\
+      (((\lambda x.\ (\lambda y.\ y + x))\ 1)\ a)[2/a] &= ((\lambda x.\ (\lambda y.\ y + x))\ 1)\ 2 \tag{AppL Beta}\\
+      ((\lambda y.\ y + x)[1/x])\ 2 &= (\lambda y.\ y + 1)\ 2 \Rightarrow \tag{Beta}\\
+      (y + 1)[2/y] &= 2 + 1 \Rightarrow \tag{Add}\\
+      3\nonumber
+    \end{align}
+
+  \vfill
+\end{enumerate}
+
+\begin{landscape}
+  \section*{2}
+
+  \begin{flushleft}
+    \textbf{There may be other correct answers to these questions.}
+    \\
+    To save space, ``$[\dots]$'' is used in some of these answers to mean ``the same context that's used in the conclusion of this rule''.
+    \\
+    \textbf{Do not use ``$\dots$'' in your exam answers.} The actual exam questions will take much less space, so it shouldn't be necessary.
+  \end{flushleft}
+
+  \begin{enumerate}[label=\alph*)]
+    \vfill
+
+    \item\mbox{}
+      \begin{center}
+        \AxiomC{$C \in [C, B, A]$}
+        \RightLabel{Ass}
+        \UnaryInfC{$[C, B, A] \vdash C$}
+
+        \AxiomC{$A \in [C, B, A]$}
+        \RightLabel{Ass}
+        \UnaryInfC{$[C, B, A] \vdash A$}
+
+        \AxiomC{$B \in [C, B, A]$}
+        \RightLabel{Ass}
+        \UnaryInfC{$[C, B, A] \vdash B$}
+
+        \RightLabel{$\wedge$-Intro}
+        \BinaryInfC{$[C, B, A] \vdash A \wedge B$}
+
+        \RightLabel{$\wedge$-Intro}
+        \BinaryInfC{$[C, B, A] \vdash C \wedge (A \wedge B)$}
+
+        \RightLabel{$\to$-Intro}
+        \UnaryInfC{$[B, A] \vdash C \to (C \wedge (A \wedge B))$}
+
+        \RightLabel{$\to$-Intro}
+        \UnaryInfC{$[A] \vdash B \to (C \to (C \wedge (A \wedge B)))$}
+
+        \RightLabel{$\to$-Intro}
+        \UnaryInfC{$[] \vdash A \to (B \to (C \to (C \wedge (A \wedge B))))$}
+
+        \DisplayProof
+      \end{center}
+
+    \vfill
+
+    \item\mbox{}
+      \begin{center}
+        \AxiomC{$A \wedge B \in [A \to (B \to C), A \wedge B]$}
+        \RightLabel{Ass}
+        \UnaryInfC{$[A \to (B \to C), A \wedge B] \vdash A \wedge B$}
+
+        \AxiomC{$A \to (B \to C) \in [\dots]$}
+        \RightLabel{Ass}
+        \UnaryInfC{$[\dots] \vdash A \to (B \to C)$}
+
+        \AxiomC{$A \in [\dots]$}
+        \RightLabel{Ass}
+        \UnaryInfC{$[\dots] \vdash A$}
+
+        \BinaryInfC{$[A, B, A \to (B \to C), A \wedge B] \vdash B \to C$}
+
+        \AxiomC{$B \in [A, B, A \to (B \to C), A \wedge B]$}
+        \RightLabel{Ass}
+        \UnaryInfC{$[A, B, A \to (B \to C), A \wedge B] \vdash B$}
+
+        \RightLabel{$\to$-Elim}
+        \BinaryInfC{$[A, B, A \to (B \to C), A \wedge B] \vdash C$}
+
+        \RightLabel{$\wedge$-Elim}
+        \BinaryInfC{$[A \to (B \to C), A \wedge B] \vdash C$}
+
+        \RightLabel{$\to$-Intro}
+        \UnaryInfC{$[A \wedge B] \vdash (A \to (B \to C)) \to C$}
+
+        \RightLabel{$\to$-Intro}
+        \UnaryInfC{$[] \vdash (A \wedge B) \to ((A \to (B \to C)) \to C)$}
+
+        \DisplayProof
+      \end{center}
+
+    \vfill
+
+    \item\mbox{}
+      \begin{center}
+        \AxiomC{$A \vee B \in [B \to C, A \to C, A \vee B]$}
+        \RightLabel{Ass}
+        \UnaryInfC{$[B \to C, A \to C, A \vee B] \vdash A \vee B$}
+
+        \AxiomC{$A \to C \in [\dots]$}
+        \RightLabel{Ass}
+        \UnaryInfC{$[\dots] \vdash A \to C$}
+
+        \AxiomC{$A \in [\dots]$}
+        \RightLabel{Ass}
+        \UnaryInfC{$[\dots] \vdash A$}
+
+        \RightLabel{$\to$-Elim}
+        \BinaryInfC{$[A, B \to C, A \to C, A \vee B] \vdash C$}
+
+        \AxiomC{$B \to C \in [\dots]$}
+        \RightLabel{Ass}
+        \UnaryInfC{$[\dots] \vdash B \to C$}
+
+        \AxiomC{$B \in [\dots]$}
+        \RightLabel{Ass}
+        \UnaryInfC{$[\dots] \vdash B$}
+
+        \RightLabel{$\to$-Elim}
+        \BinaryInfC{$[A, B \to C, A \to C, A \vee B] \vdash C$}
+
+        \RightLabel{$\vee$-Elim}
+        \TrinaryInfC{$[B \to C, A \to C, A \vee B] \vdash C$}
+
+        \RightLabel{$\to$-Intro}
+        \UnaryInfC{$[A \to C, A \vee B] \vdash (B \to C) \to C$}
+
+        \RightLabel{$\to$-Intro}
+        \UnaryInfC{$[A \vee B] \vdash (A \to C) \to ((B \to C) \to C)$}
+
+        \RightLabel{$\to$-Intro}
+        \UnaryInfC{$[] \vdash (A \vee B) \to ((A \to C) \to ((B \to C) \to C))$}
+        \DisplayProof
+      \end{center}
+
+    \vfill
+
+    \item\mbox{}
+      \begin{center}
+        \AxiomC{$B \to C \in [A, B \to C, A \to B]$}
+        \RightLabel{Ass}
+        \UnaryInfC{$[A, B \to C, A \to B] \vdash B \to C$}
+
+        \AxiomC{$A \to B \in [A, B \to C, A \to B]$}
+        \RightLabel{Ass}
+        \UnaryInfC{$[A, B \to C, A \to B] \vdash A \to B$}
+
+        \AxiomC{$A \in [A, B \to C, A \to B]$}
+        \RightLabel{Ass}
+        \UnaryInfC{$[A, B \to C, A \to B] \vdash A$}
+
+        \RightLabel{$\to$-Elim}
+        \BinaryInfC{$[A, B \to C, A \to B] \vdash B$}
+
+        \RightLabel{$\to$-Elim}
+        \BinaryInfC{$[A, B \to C, A \to B] \vdash C$}
+
+        \RightLabel{$\to$-Intro}
+        \UnaryInfC{$[B \to C, A \to B] \vdash A \to C$}
+
+        \RightLabel{$\to$-Intro}
+        \UnaryInfC{$[A \to B] \vdash (B \to C) \to (A \to C)$}
+
+        \RightLabel{$\to$-Intro}
+        \UnaryInfC{$[] \vdash (A \to B) \to ((B \to C) \to (A \to C))$}
+
+        \DisplayProof
+      \end{center}
+
+    \vfill
+  \end{enumerate}
+
+  \section*{3}
+
+  \begin{flushleft}
+    \textbf{These are the only correct answers to these questions.}
+    \\
+    To save space, ``$[\dots]$'' is used in some of these answers to mean ``the same context that's used in the conclusion of this rule''.
+    \\
+    \textbf{Do not use ``$\dots$'' in your exam answers.} The actual exam questions will take much less space, so it shouldn't be necessary.
+  \end{flushleft}
+
+  \begin{enumerate}[label=\alph*)]
+    \vfill
+
+    \item\mbox{}
+      \begin{center}
+        \AxiomC{$[x : \texttt{Bool}](x) = \texttt{Bool}$}
+        \RightLabel{Var}
+        \UnaryInfC{$[x : \texttt{Bool}] \vdash x : \texttt{Bool}$}
+
+        \AxiomC{$[\dots](y) = \texttt{Num}$}
+        \RightLabel{Var}
+        \UnaryInfC{$[\dots] \vdash y : \texttt{Num}$}
+
+        \AxiomC{}
+        \RightLabel{Num}
+        \UnaryInfC{$[\dots] \vdash 1 : \texttt{Num}$}
+
+        \RightLabel{Add}
+        \BinaryInfC{$[y : \texttt{Num}, x : \texttt{Bool}] \vdash y + 1 : \texttt{Num}$}
+
+        \RightLabel{Lambda}
+        \UnaryInfC{$[x : \texttt{Bool}] \vdash \lambda y.\ y + 1 : \texttt{Num} \to \texttt{Num}$}
+
+        \AxiomC{$[\dots](y) = \texttt{Num}$}
+        \RightLabel{Var}
+        \UnaryInfC{$[\dots] \vdash y : \texttt{Num}$}
+
+        \AxiomC{}
+        \RightLabel{Num}
+        \UnaryInfC{$[\dots] \vdash 1 : \texttt{Num}$}
+
+        \RightLabel{Sub}
+        \BinaryInfC{$[y : \texttt{Num}, x : \texttt{Bool}] \vdash y - 1 : \texttt{Num}$}
+
+        \RightLabel{Lambda}
+        \UnaryInfC{$[x : \texttt{Bool}] \vdash \lambda y.\ y - 1 : \texttt{Num} \to \texttt{Num}$}
+
+        \RightLabel{If}
+        \TrinaryInfC{$[x : \texttt{Bool}] \vdash \texttt{if}\ x\ \texttt{then}\ (\lambda y.\ y + 1)\ \texttt{else}\ (\lambda y.\ y - 1) : \texttt{Num} \to \texttt{Num}$}
+
+        \DisplayProof
+      \end{center}
+
+    \vfill
+
+    \item\mbox{}
+      \begin{center}
+        \AxiomC{$[y : \texttt{Num}, x : \texttt{Num}](x) = \texttt{Num}$}
+        \RightLabel{Var}
+        \UnaryInfC{$[y : \texttt{Num}, x : \texttt{Num}] \vdash x : \texttt{Num}$}
+
+        \AxiomC{$[y : \texttt{Num}, x : \texttt{Num}](y) = \texttt{Num}$}
+        \RightLabel{Var}
+        \UnaryInfC{$[y : \texttt{Num}, x : \texttt{Num}] \vdash y : \texttt{Num}$}
+
+        \RightLabel{Add}
+        \BinaryInfC{$[y : \texttt{Num}, x : \texttt{Num}] \vdash x + y : \texttt{Num}$}
+
+        \RightLabel{Lambda}
+        \UnaryInfC{$[x : \texttt{Num}] \vdash \lambda y.\ x + y : \texttt{Num} \to \texttt{Num}$}
+
+        \RightLabel{Lambda}
+        \UnaryInfC{$[] \vdash \lambda x.\ (\lambda y.\ x + y) : \texttt{Num} \to (\texttt{Num} \to \texttt{Num})$}
+
+        \AxiomC{}
+        \RightLabel{Num}
+        \UnaryInfC{$[] \vdash 1 : \texttt{Num}$}
+
+        \RightLabel{App}
+        \BinaryInfC{$[] \vdash (\lambda x.\ (\lambda y.\ x + y))\ 1 : \texttt{Num} \to \texttt{Num}$}
+
+        \DisplayProof
+      \end{center}
+
+    \vfill
+
+    \item\mbox{}
+      \begin{center}
+        \AxiomC{}
+        \RightLabel{Num}
+        \UnaryInfC{$[] \vdash 1 : \texttt{Num}$}
+
+        \AxiomC{}
+        \RightLabel{Num}
+        \UnaryInfC{$[] \vdash 1 : \texttt{Num}$}
+
+        \RightLabel{Add}
+        \BinaryInfC{$[] \vdash 1 + 1 : \texttt{Num}$}
+
+        \AxiomC{}
+        \RightLabel{Num}
+        \UnaryInfC{$[] \vdash 2 : \texttt{Num}$}
+
+        \RightLabel{Pair}
+        \BinaryInfC{$[] \vdash ((1 + 1), 2) : (\texttt{Num}, \texttt{Num})$}
+
+        \AxiomC{$[a : \texttt{Num}, b : \texttt{Num}](a) = \texttt{Num}$}
+        \RightLabel{Var}
+        \UnaryInfC{$[a : \texttt{Num}, b : \texttt{Num}] \vdash a : \texttt{Num}$}
+
+        \AxiomC{$[a : \texttt{Num}, b : \texttt{Num}](b) = \texttt{Num}$}
+        \RightLabel{Var}
+        \UnaryInfC{$[a : \texttt{Num}, b : \texttt{Num}] \vdash b : \texttt{Num}$}
+
+        \RightLabel{Less}
+        \BinaryInfC{$[a : \texttt{Num}, b : \texttt{Num}] \vdash a < b : \texttt{Bool}$}
+
+        \BinaryInfC{$[] \vdash \texttt{let}\ (a, b) = ((1 + 1), 2)\ \texttt{in}\ a < b : \texttt{Bool}$}
+
+        \DisplayProof
+      \end{center}
+
+    \vfill
+
+    \item\mbox{}
+      \begin{center}
+        \AxiomC{$[a : (P\ |\ \texttt{Bool})](a) = (P\ |\ \texttt{Bool})$}
+        \RightLabel{Var}
+        \UnaryInfC{$[a : (P\ |\ \texttt{Bool})] \vdash a : (P\ |\ \texttt{Bool})$}
+
+        \AxiomC{}
+        \RightLabel{Bool}
+        \UnaryInfC{$[a_1 : P, a : (P\ |\ \texttt{Bool})] \vdash \texttt{true} : \texttt{Bool}$}
+
+        \AxiomC{$[a_2 : \texttt{Bool}, a : (P\ |\ \texttt{Bool})](a_2) = \texttt{Bool}$}
+        \RightLabel{Var}
+        \UnaryInfC{$[a_2 : \texttt{Bool}, a : (P\ |\ \texttt{Bool})] \vdash a_2 : \texttt{Bool}$}
+
+        \RightLabel{Case}
+        \TrinaryInfC{$[a : (P\ |\ \texttt{Bool})] \vdash \texttt{case}\ a\ \texttt{of}\ \{\ \texttt{left}\ a_1 \to \texttt{true}\ |\ \texttt{right}\ a_2 \to a_2 \} : \texttt{Bool}$}
+
+        \RightLabel{Lambda}
+        \UnaryInfC{$[] \vdash \lambda a.\ \texttt{case}\ a\ \texttt{of}\ \{\ \texttt{left}\ a_1 \to \texttt{true}\ |\ \texttt{right}\ a_2 \to a_2 \} : (P\ |\ \texttt{Bool}) \to \texttt{Bool}$}
+
+        \DisplayProof
+      \end{center}
+
+    \vfill
+  \end{enumerate}
+\end{landscape}
+
+\pagebreak
+
+\section*{4}
+
+\begin{flushleft}
+  \textbf{These are the only correct answers to these questions}, although any differences in formatting and list ordering are fine as long as your answer has all the right content, and it's okay if you include more information than the question asks for.
+\end{flushleft}
+
+\begin{enumerate}[label=\alph*)]
+  \item
+    \begin{enumerate}[label=\arabic*)]
+      \item $[n : \texttt{Num}, m : \texttt{Num}, x : \texttt{Bool}, y : \texttt{Num}]$
+      \item $[m : \texttt{Num}, x : \texttt{Bool}, y : \texttt{Num}]$
+      \item $[m : \texttt{Num}, x : \texttt{Bool}, y : \texttt{Num}]$
+      \item $[b : \texttt{Num}, a : \texttt{Num}]$
+      \item $[c : \texttt{Num}, b : \texttt{Num}, a : \texttt{Num}]$
+      \item $[u : \texttt{Num}]$
+    \end{enumerate}
+
+  \bigskip
+
+  \item
+    \begin{enumerate}[label=\arabic*)]
+      \item
+        \begin{tabular}{| c | c |}
+          \hline
+          \texttt{plusOrMinus} &
+            \texttt{n} = \texttt{4},
+            \texttt{m} = \texttt{4},
+            \texttt{x} = \texttt{true},
+            \texttt{y} = \texttt{3}\\
+          \hline
+          \texttt{doNothing} & \texttt{a} = \texttt{3}\\
+          \hline
+          \texttt{main} &\\
+          \hline
+        \end{tabular}
+
+      \setcounter{enumii}{2}
+      \item
+        \begin{tabular}{| c | c |}
+          \hline
+          \texttt{plusOrMinus} &
+            \texttt{m} = \texttt{4},
+            \texttt{x} = \texttt{true},
+            \texttt{y} = \texttt{3}\\
+          \hline
+          \texttt{doNothing} & \texttt{a} = \texttt{3}\\
+          \hline
+          \texttt{main} &\\
+          \hline
+        \end{tabular}
+
+      \item
+        \begin{tabular}{| c | c |}
+          \hline
+          \texttt{doNothing} &
+            \texttt{b} = \texttt{4},
+            \texttt{a} = \texttt{3}\\
+          \hline
+          \texttt{main} &\\
+          \hline
+        \end{tabular}
+
+      \setcounter{enumii}{1}
+      \item
+        \begin{tabular}{| c | c |}
+          \hline
+          \texttt{plusOrMinus} &
+            \texttt{m} = \texttt{3},
+            \texttt{x} = \texttt{false},
+            \texttt{y} = \texttt{4}\\
+          \hline
+          \texttt{doNothing} &
+            \texttt{b} = \texttt{4},
+            \texttt{a} = \texttt{3}\\
+          \hline
+          \texttt{main} &\\
+          \hline
+        \end{tabular}
+
+      \item
+        \begin{tabular}{| c | c |}
+          \hline
+          \texttt{plusOrMinus} &
+            \texttt{m} = \texttt{3},
+            \texttt{x} = \texttt{false},
+            \texttt{y} = \texttt{4}\\
+          \hline
+          \texttt{doNothing} &
+            \texttt{b} = \texttt{4},
+            \texttt{a} = \texttt{3}\\
+          \hline
+          \texttt{main} &\\
+          \hline
+        \end{tabular}
+
+      \setcounter{enumii}{4}
+      \item
+        \begin{tabular}{| c | c |}
+          \hline
+          \texttt{doNothing} &
+            \texttt{c} = \texttt{3},
+            \texttt{b} = \texttt{4},
+            \texttt{a} = \texttt{3}\\
+          \hline
+          \texttt{main} &\\
+          \hline
+        \end{tabular}
+
+      \item
+        \begin{tabular}{| c | c |}
+          \hline
+          \texttt{main} & \texttt{u} = \texttt{3}\\
+          \hline
+        \end{tabular}
+    \end{enumerate}
+\end{enumerate}
+
+\end{document}

@@ -1,0 +1,134 @@
+CS 320 Principles of Programming Languages
+Homework 1
+
+Answer text and explanations are between { curly braces }.
+
+
+1.
+
+Comment briefly on the role of "syntax" and "semantics" in each of the
+following scenarios. [NOTE: We are not looking for very deep answers here, just
+for evidence that you have a good understanding of the basic concepts. A couple
+of sentences for each scenario should be sufficient.]
+
+  { These are just example answers; the general principle is that syntax is the
+    _form_ of input and semantics is the _meaning_ or _behavior_ produced in
+    response to input. }
+
+
+  a) An accountant enters financial data into some of the cells of a
+     spreadsheet, and the spreadsheet program calculates the values of several
+     other cells automatically.
+
+   { The syntax is the format of the data in the cells and the layout and
+     arrangement of the cells; the sequence of calculations that are performed
+     in response to input is the semantics of the input. }
+
+
+  b) A person places a phone call on a pay phone in 1998 by inserting a quarter
+     and dialing a phone number.
+
+   { The action of pressing phone buttons can be thought of as a form of
+     syntax, or more directly, the protocol that describes the electric pulses
+     sent over the telephone wire in response to button presses can be thought
+     of as a syntax description. The action of connecting the two phones
+     together in an audio call is the semantics of the input. }
+
+
+  c) An orchestra plays a symphony, with each orchestra member reading from the
+     sheet music for their individual part.
+
+   { The collection of all the sheet music is the syntax; the semantics is
+     the actions the musicians take as they play it, or possibly the sound
+     waves that they produce. }
+
+
+2.
+
+For each of the following items, explain in your own words what the term refers
+to and why it might be important and/or relevant in the design of a practical
+programming language:
+
+  a) concrete syntax
+
+  { Concrete syntax is the form of a program when stored as data - for example,
+    the concrete syntax definition of C++ is the set of rules that describe the
+    text contents of .cpp files. It's possible to work directly with the abstract
+    syntax of a programming language when we're doing theoretical work, but in
+    order to implement a programming language on actual hardware we need to
+    specify how a program is stored as data; also, abstract syntax is designed to
+    be easy for a program to work with algorithmically and usually isn't very
+    human-friendly, so concrete syntax is useful to enable people to write
+    programs with notation that appeals more to our intuitions. }
+
+
+  b) abstraction (not the same thing as "abstract syntax"!)
+
+  { The act of abstraction is generally the process of identifying and naming
+    patterns so they can be used without repeating details. We say that some
+    construct A is an abstraction of another construct B when we can get A by
+    forgetting some details about B in order to focus only on the details
+    relevant to some context - for example, an interface in C++ is an abstraction
+    of some class that implements it, or of the whole set of classes that
+    implement it. Abstraction is fundamental to programming languages because
+    programmers use abstractions to manage the size, readability, and
+    extensibility of a codebase. }
+
+
+  c) dynamic semantics
+
+  { The dynamic semantics of a program is the behavior of the program at
+    runtime. A formal description of the dynamic semantics of a programming
+    language is necessary in order to prove anything about programs in that
+    language and helpful in testing, and in practice every executable programming
+    language has some dynamic semantics even if nobody has produced a formal
+    description of it. In a sense, the code of a compiler for some language can
+    be thought of as a description of its dynamic semantics in the language used
+    to build the compiler. }
+
+
+3.
+
+In the example of evaluation given in the slides (Week 1 slides 31-40), a Prop
+expression is normalized in a step-by-step process: at each step, the
+bottom-leftmost subtree is reduced, until we have a tree consisting only of a
+single node that can't be reduced anymore. With this example expression, we get
+the same result if we instead reduce the bottom-rightmost subtree at each step.
+Is there any Prop expression that gives different results under some
+environment if we evaluate left-to-right vs. right-to-left? Justify your
+answer.
+
+{ The relevant property of the Prop language is called "referential
+  transparency", defined here in terms of the eval function (denotational
+  semantics).
+  
+  If we have some environment E and expression P, and some subtree Q of P, we
+  can replace Q with the result of "eval Q E" without changing the result of
+  "eval P E". For example, with Q = AND TRUE FALSE and P = OR Q FALSE, we can
+  replace Q in P with FALSE without changing the meaning of P.
+
+  This might seem obvious in Prop, but it's not true in all languages - for
+  example, in C++, we can't replace printf("A") with printf("B") without
+  changing the behavior of a program, even though they both evaluate to the
+  same value (void).
+
+  We can prove that Prop is referentially transparent with a technique called
+  structural induction, which we might cover in the second half of the course
+  if we have time. Informally, it's easy to see the property is true for
+  TRUE/FALSE/IN since they don't have any subtrees, and we can show that it's
+  true for something like AND P Q if we assume that it's true for P and Q, so
+  we can construct a proof for any arbitrary expression.
+
+  The associative property of the Prop operators is a similar concept, but not
+  actually relevant here. The abstract syntax for Prop captures grouping of
+  binary operators, so A & (B & C) is a different tree than (A & B) & C:
+
+                      AND                        AND
+                      / \                        / \
+                     A  AND                    AND  C
+                        / \                    / \
+                       B   C                  A   B
+
+  Associativity says that evaluating these two trees should produce the same
+  result, but doesn't say anything about evaluating one of the trees in two
+  different ways. }

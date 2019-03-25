@@ -1,0 +1,226 @@
+CS 320 Principles of Programming Languages
+Homework 2
+Due Monday 10/22 before class (6:40pm)
+
+
+1. (5 points)
+
+Imagine you're asked to build a program that translates Javascript code into
+Python code. What does it mean to claim this program is correct with respect to
+the Javascript and Python interpreters? How would you test this claim?
+
+
+
+Answer:
+
+Using compiler, we can translate programs i.e, convert programs in the syntax of a source language
+(Javascript in this case) into the syntax of a target language (Python in this case). This program will be correct
+with respect to the Javascript and Python interpreters firstly, if the compiler produced valid output for 
+any valid input and secondly, the output should have same semantics as the input. Finally, the result
+that we get by running Javascript's interpreter (ie, interpreter on source program) should be the same
+as the result we get by running Python's interpreter (i.e, inpterpreter on the target program). If the
+results are same, then this program is correct with respect to the Jvascript and Python interpreters. 
+
+For testing this claim, as mentioned above, we can first interpret Javascript code. We should get valid 
+output for valid input and they should have same semantics. Then, we can translate code from Javascript to 
+Python and then interpret the translated program. Again, we should get valid output for valid input and 
+they should have same semantics. If the output obtained from both the interpreters is same, then this claim
+holds true.
+
+
+
+
+
+
+
+2. (6 points)
+
+Consider the following C program.
+
+  int main(int argc, char** argv) {
+    int x = 1, y = 2, z = 3;
+    int w = x * y + z;
+    return 0;
+  }
+
+For each of the following compiler phases, describe a single change you could
+make to this program that would cause the compiler to emit an error in that
+phase.
+
+a) source input
+
+
+Answer: For source input, the symbols must be valid. So, to emit an error we can insert invalid
+symbols like greek characters: omega, delta etc. That means, if I change w to omega on the third
+line of the given code, we'll get a compiler error. 
+
+
+b) lexical analysis
+
+
+Answer: For lexical analysis, the stream of characters is converted into a stream of tokens. It is 
+just like spell check as it is related to the vocabulary of the programming language. So, if I change
+the spelling of int (ie, mispell it) on second line of the given code to make it itn, then the compiler 
+will emit an error as it doesnt recognise 'itn' to be part of it's vocabulary.
+eg)
+	Correct:  int x = 1, y = 2, z = 3;
+	Error:    itn x = 1, y = 2, z = 3;
+
+
+c) parsing
+
+Answer: For parsing, the input should be structurally well formed ie, the grammar should be correct and
+the expression made by the tokens should be syntactically correct. So, if I insert an extra curly brace
+on the first line of the given code, the compiler will emit an error as there will be a mismatch of the 
+number of open curly braces to the closing curly braces. According to the syntax, there should be the 
+same number of open and closing curly braces, ie., for each open curly brace there should be a closing
+curly brace.
+Eg:
+
+	Correct:  int main(int argc, char** argv) {
+	Error:	  int main(int argc, char** argv) {{
+
+
+
+
+
+
+
+
+
+
+3. (8 points)
+
+For each of the following, give a fixity (precedence and associativity) for the
+infix operators in the string so that the string would parse as intended, or
+give a reason why it's impossible. Assume anything that isn't a letter or a
+parenthesis is a binary operator.
+
+For example, if we wanted the string "A * B * C + D + E" to parse as
+"((A * (B * C)) + D) + E", we could give the operators the following fixities:
+  
+  + is left-associative with precedence 1
+  * is right-associative with precedence 2
+
+However, the string "A + B + C + D" can't possibly parse as
+"(A + B) + (C + D)", because the + operator must be left-associative,
+right-associative, or non-associative, and none of those associativity choices
+choice will produce that parenthesization.
+
+Keep in mind that we're only dealing with syntax here - the meanings of the
+operators are completely irrelevant!
+
+In most cases there will be multiple valid answers, but you only have to give
+one.
+
+  a) "A * B + C * D" parses as "(A * B) + (C * D)"
+
+
+	Answer:	
+	* has precedence 2 and has left associativity
+	+ has precedence 1 and has left associativity
+
+
+  b) "A & B ^ C | D | E" parses as "(A & (B ^ C)) | (D | E)"
+  
+
+	Answer:
+	^ has precendece 3 and has right associativity
+        & has precedence 2 and has left associativity
+	| is right associative with precedence 1
+
+
+  c) "A % B @ C = D % E @ F" parses as "((A % B) @ C) = (D % (E @ F))"
+  
+	
+	Answer: 
+	This is impossible as on the left hand side of =, % has higher precedence 
+	than @ but on the right hand side of =, @ has higher precedence than %.
+	= has the lowest precedence and is non associative.
+	The precedence of * and + must remain consistent throughout and thus, this is 
+	impossible.
+		
+
+
+  d) "A + B * C = A * B + A * C" parses as "((A + B) * C) = ((A * (B + A)) * C)"
+
+
+	Answer:
+	+ has precedence 3 and has left associativity.
+	* has precedence 2 and has left associativity
+	= has precedence 1 and has left associativity
+
+
+
+
+
+
+
+4. (6 points)
+
+The week 3 slides define an unambiguous CFG for a small arithmetic language
+(where "n" is taken to be any natural number):
+
+  E --> P
+  E --> E + P
+  P --> A
+  P --> P * A
+  A --> (E)
+  A --> n
+
+In this grammar, both the + and the * operator are left-associative, and * has
+a higher precedence than +. This is enforced by the rules of the grammar, which
+divides arithmetic expressions into three categories:
+
+  - E represents expressions involving the + operator, only allowing other E
+    expressions on the right if they're within parentheses.
+
+  - P represents expressions involving the * operator, only allowing other P
+    expressions on the right or E expressions on either side if they're within
+    parentheses.
+
+  - A represents numeric literals or parenthesized expressions.
+
+Here are some example leftmost derivations using this CFG:
+
+  "E" -> "P" -> "A" -> "10"
+
+  "E" -> "E + P" -> "P + P" -> "A + P" -> "1 + P" -> "1 + A" -> "1 + 2"
+
+  "E" -> "E + P" -> "E + P + P" -> "P + P + P" -> "A + P + P" ->
+  "1 + P + P" -> "1 + A + P" -> "1 + (E) + P" -> "1 + (P) + P" ->
+  "1 + (P * A) + P" -> "1 + (A * A) + P" -> "1 + (2 * A) + P" ->
+  "1 + (2 * 3) + P" -> "1 + (2 * 3) + A" -> "1 + (2 * 3) + 4"
+
+Modify the CFG to add a new nonterminal X, representing expressions involving
+an infix exponent operator (^), so that the ^ operator is right-associative and
+has higher precedence than both + and *. The CFG should remain unambiguous, so
+that there is exactly one valid leftmost derivation that produces any given
+expression in the language. Give two example leftmost derivations that involve
+the ^ operator.
+
+
+
+Answer:
+
+  E --> P
+  E --> E + P
+  P --> A 
+  P --> P * A
+  A --> X
+  A --> A ^ X
+  X --> (E) 
+  X --> n
+
+
+leftmost derviations:
+
+1)    "E" -> "P" -> "A" -> "A^X" -> "X^X" -> "(E)^X" -> "(E+P)^X" -> "(P+P)^X"  -> "(A+P)^X" -> "(X+P)^X" -> "(5+P)^X" -> "(5+A)^X" -> "(5+X)^X" -> "(5+3)^X" -> "(5+3)^2"
+
+2)    "E" -> "E+P" -> "P+P" -> "P*A+P" -> "A*A+P" -> "X*A+P" -> "1*A+P" -> "1*A^X+P" -> "1*X^X+P" -> "1*2^X+P" -> "1*2^2+P" -> "1*2^2+A" -> "1*2^2+X"  -> "1*2^2+10"
+
+
+
+
+
+Questions 5 through 7 are in hw2.lhs.

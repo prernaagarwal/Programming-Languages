@@ -1,0 +1,31 @@
+CS 320 Principles of Programming Languages
+Homework 1
+Submit via D2L by Wednesday 10/3 before the start of class (6:40pm)
+
+20 points total
+
+
+1. (2 points each)
+
+Comment briefly on the role of "syntax" and "semantics" in each of the following scenarios. [NOTE: We are not looking for very deep answers here, just for evidence that you have a good understanding of the basic concepts. A couple of sentences for each scenario should be sufficient.]
+
+  a) An accountant enters financial data into some of the cells of a spreadsheet, and the spreadsheet program calculates the values of several other cells automatically.
+  b) A person places a phone call on a pay phone in 1998 by inserting a quarter and dialing a phone number.
+  c) An orchestra plays a symphony, with each orchestra member reading from the sheet music for their individual part.
+
+
+2. (2 points each)
+
+For each of the following items, explain in your own words what the term refers to and why it might be important and/or relevant in the design of a practical programming language:
+
+  a) concrete syntax
+  b) abstraction (not the same thing as "abstract syntax"!)
+  c) dynamic semantics
+
+
+3. (3 points)
+
+In the example of evaluation given in the slides (Week 1 slides 31-40), a Prop expression is normalized in a step-by-step process: at each step, the bottom-leftmost subtree is reduced, until we have a tree consisting only of a single node that can't be reduced anymore. With this example expression, we get the same result if we instead reduce the bottom-rightmost subtree at each step. Is there any Prop expression that gives different results under some environment if we evaluate left-to-right vs. right-to-left? Justify your answer.
+
+
+For questions 4 and 5, open hw1.lhs and follow the instructions in that file.

@@ -1,0 +1,162 @@
+\documentclass[12pt]{article}
+
+\usepackage{bussproofs}
+\usepackage[margin=0.5in]{geometry}
+
+\begin{document}
+
+\begin{center}
+  \section*{1}
+
+  \vfill
+
+  \subsection*{a}
+  \bigskip
+
+  \AxiomC{$B \in [B, A]$}
+  \RightLabel{Ass}
+  \UnaryInfC{$[B, A] \vdash B$}
+
+  \AxiomC{$A \in [B, A]$}
+  \RightLabel{Ass}
+  \UnaryInfC{$[B, A] \vdash A$}
+
+  \RightLabel{$\wedge$-Intro}
+  \BinaryInfC{$[B, A] \vdash B \wedge A$}
+
+  \RightLabel{$\to$-Intro}
+  \UnaryInfC{$[A] \vdash B \to (B \wedge A)$}
+
+  \RightLabel{$\to$-Intro}
+  \UnaryInfC{$[] \vdash A \to (B \to (B \wedge A))$}
+
+  \DisplayProof
+
+  \vfill
+
+  \subsection*{b}
+  \bigskip
+
+  \AxiomC{$A \vee A \in [A \vee A]$}
+  \RightLabel{Ass}
+  \UnaryInfC{$[A \vee A] \vdash A \vee A$}
+
+  \AxiomC{$A \in [A, A \vee A]$}
+  \RightLabel{Ass}
+  \UnaryInfC{$[A, A \vee A] \vdash A$}
+
+  \AxiomC{$A \in [A, A \vee A]$}
+  \RightLabel{Ass}
+  \UnaryInfC{$[A, A \vee A] \vdash A$}
+
+  \RightLabel{$\vee$-Elim}
+  \TrinaryInfC{$[A \vee A] \vdash A$}
+  \RightLabel{$\to$-Intro}
+
+  \UnaryInfC{$[] \vdash (A \vee A) \to A$}
+
+  \DisplayProof
+
+  \vfill
+
+  \subsection*{c}
+  \bigskip
+
+  \AxiomC{$A \to B \in [A \to B, A]$}
+  \RightLabel{Ass}
+  \UnaryInfC{$[A \to B, A] \vdash A \to B$}
+
+  \AxiomC{$A \in [A \to B, A]$}
+  \RightLabel{Ass}
+  \UnaryInfC{$[A \to B, A] \vdash A$}
+
+  \RightLabel{$\to$-Elim}
+  \BinaryInfC{$[A \to B, A] \vdash B$}
+  
+  \RightLabel{$\to$-Intro}
+  \UnaryInfC{$[A] \vdash (A \to B) \to B$}
+
+  \DisplayProof
+
+  \vfill
+\end{center}
+
+\newpage
+
+\begin{center}
+  \section*{2}
+
+  \vfill
+
+  \subsection*{a}
+  \bigskip
+
+  \AxiomC{$[y : B, x : A](y) = B$}
+  \RightLabel{Var}
+  \UnaryInfC{$[y : B, x : A] \vdash y : B$}
+
+  \AxiomC{$[y : B, x : A](x) = A$}
+  \RightLabel{Var}
+  \UnaryInfC{$[y : B, x : A] \vdash x : A$}
+
+  \RightLabel{Pair}
+  \BinaryInfC{$[y : B, x : A] \vdash (y, x) : B \wedge A$}
+
+  \RightLabel{Lambda}
+  \UnaryInfC{$[x : A] \vdash \lambda y.\ (y, x) : B \to (B \wedge A)$}
+
+  \RightLabel{Lambda}
+  \UnaryInfC{$[] \vdash \lambda x.\ \lambda y.\ (y, x) : A \to (B \to (B \wedge A))$}
+
+  \DisplayProof
+
+  \vfill
+
+  \subsection*{b}
+  \bigskip
+
+  \AxiomC{$[x : A \vee A](x) = A \vee A$}
+  \RightLabel{Var}
+  \UnaryInfC{$[x : A \vee A] \vdash x : A \vee A$}
+
+  \AxiomC{$[y : A, x : A \vee A](y) = A$}
+  \RightLabel{Var}
+  \UnaryInfC{$[y : A, x : A \vee A] \vdash y : A$}
+
+  \AxiomC{$[z : A, x : A \vee A](z) = A$}
+  \RightLabel{Var}
+  \UnaryInfC{$[z : A, x : A \vee A] \vdash z : A$}
+
+  \RightLabel{Case}
+  \TrinaryInfC{$[x : A \vee A] \vdash \texttt{case}\ x\ \texttt{of}\ \{ \texttt{left}\ y \to y\ ;\ \texttt{right}\ z \to z \} : A$}
+
+  \RightLabel{Lambda}
+  \UnaryInfC{$[] \vdash \lambda x.\ \texttt{case}\ x\ \texttt{of}\ \{ \texttt{left}\ y \to y\ ;\ \texttt{right}\ z \to z \} : (A \vee A) \to A$}
+
+  \DisplayProof
+
+  \vfill
+
+  \subsection*{c}
+  \bigskip
+
+  \AxiomC{$[f : A \to B, x : A](f) = A \to B$}
+  \RightLabel{Var}
+  \UnaryInfC{$[f : A \to B, x : A] \vdash f : A \to B$}
+
+  \AxiomC{$[f : A \to B, x : A](x) = A$}
+  \RightLabel{Var}
+  \UnaryInfC{$[f : A \to B, x : A] \vdash x : A$}
+
+  \RightLabel{App}
+  \BinaryInfC{$[f : A \to B, x : A] \vdash f\ x : B$}
+  
+  \RightLabel{Lambda}
+  \UnaryInfC{$[x : A] \vdash \lambda f.\ f\ x : (A \to B) \to B$}
+
+  \DisplayProof
+
+  \vfill
+\end{center}
+
+\end{document}

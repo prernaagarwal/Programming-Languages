@@ -1,0 +1,105 @@
+This is a high-level list of the main concepts we've covered in the course so
+far, to aid in studying for the midterm exam (which will be on Monday 2/12
+during normal class time). It's intended as a guide through the lecture slides,
+which is where most of the exam content will be drawn from; the solution keys
+for the first two homework assignments will also be helpful to review.
+
+Items marked with a ! are especially important to focus on: those are the major
+items that you're expected to come out of this course with an understanding of.
+(They're the things that are directly relevant to the first four entries in the
+"Course objectives" section of the syllabus.) While anything in here is fair
+game for the exam, you should be able to do reasonably well as long as you
+understand these core topics.
+
+The format of the exam will be similar to the homework, with a mix of short
+answer questions and technical questions. You'll be allowed to bring and use a
+sheet of handwritten notes on one side of a standard 8.5"x11" sheet of
+printer/notebook paper. You might have to read some simple Haskell code, but
+you won't be asked to write any. The content will be drawn from the first four
+weeks of class, with a focus on syntax.
+
+Week 1:
+  ! definitions
+    - syntax
+      - concrete syntax
+      - abstract syntax
+      - syntax analysis
+    - semantics
+      - static semantics
+      - dynamic semantics
+  - Prop example (Prop.lhs)
+    - Haskell abstract syntax definition
+    - normalization (operational semantics)
+    - evaluation (denotational semantics)
+    - equivalences (axiomatic semantics)
+  - programming language features
+    - variables
+    - abstraction
+    - control structures
+    - types
+
+Week 2:
+  ! definitions
+    - compiler
+    - interpreter
+  ! compilers
+    - compiler correctness
+  ! interpreters
+    - interpreter characteristics
+    - CPU as an interpreter
+  - language vs. implementation
+  - compiler structure
+    ! front end
+      - source input
+      - lexical analysis
+      - parsing
+      - static analysis
+    ! back end
+      - code generation
+      - optimization
+    - phases vs. passes
+  - intermediate languages
+  - bootstrapping
+
+Week 3:
+  - formal languages
+  - regular expressions
+    ! construction
+    - interpretation
+      - as DFAs (operational semantics)
+      ! as regular language specifications (denotational semantics)
+    - pumping lemma to show irregularity
+  - definitions
+    - lexeme
+    - token type
+    - token
+    - pattern
+  - context-free grammars
+    - formal definition
+    ! construction
+    ! interpretation
+      - as context-free language specifications (denotational semantics)
+    ! derivations
+    ! parse trees
+    ! ambiguity
+    ! fixity
+      - precedence
+      - associativity
+
+Week 4:
+  - tokenizing
+    ! token attributes
+    - Haskell lexer example (Lex.lhs, PropLex.lhs)
+  - parsing
+    - generating CFG derivations mechanically
+    - converting CSTs to ASTs
+    - backtracking
+    - LL parsing
+      - LL grammar
+      - LL table parsing automaton
+    - recursive descent parsing
+      - prefix Prop pseudocode
+      - computational complexity
+      - parser combinators
+      - left recursion/left factoring
+  - EBNF grammars

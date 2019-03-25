@@ -1,0 +1,160 @@
+CS 320 Principles of Programming Languages
+Homework 2 answer key
+Solution text is in { curly braces }.
+
+1. (5 points)
+
+Imagine you're asked to build a program that translates Javascript code into
+Python code. What does it mean to claim this program is correct with respect to
+the Javascript and Python interpreters? How would you test this claim?
+
+  { The program should output a valid Python file for any valid input JS file,
+    and running any valid JS file through the JS interpreter should
+    result in the same program behavior as running it through the translator and
+    then through the Python interpreter. }
+
+
+2. (6 points)
+
+Consider the following C program.
+
+  int main(int argc, char** argv) {
+    int x = 1, y = 2, z = 3;
+    int w = x * y + z;
+    return 0;
+  }
+
+For each of the following compiler phases, describe a single change you could
+make to this program that would cause the compiler to emit an error in that
+phase.
+
+a) source input
+
+  { The source input phase fails when a file contains a _character_ that isn't
+    allowed to appear anywhere in a program file. In C++, this includes many
+    nonprintable ASCII characters, like the terminal bell character  - that'll
+    probably even show up weird in your browser or text editor, since it's a
+    character that's not usually expected to appear in text files. }
+
+b) lexical analysis
+
+  { The lexing phase fails when a file contains a _lexeme_ that isn't allowed to
+    appear anywhere in a program file. In C++, this includes broken literals like
+    1a (an invalid numeric literal) and 'abc' (an invalid character literal).
+    It notably does not include misspelled keywords, since e.g. "iif" is
+    allowed to appear in a C++ file as a variable name. }
+
+c) parsing
+
+  { The parsing phase fails when a file cannot be parsed into an abstract syntax tree.
+    Most syntax errors that you're likely to encounter in practice are parsing
+    errors; popular examples include missing semicolons and missing closing
+    braces. }
+
+
+3. (8 points)
+
+For each of the following, give a fixity (precedence and associativity) for the
+infix operators in the string so that the string would parse as intended, or
+give a reason why it's impossible. Assume anything that isn't a letter or a
+parenthesis is a binary operator.
+
+For example, if we wanted the string "A * B * C + D + E" to parse as
+"((A * (B * C)) + D) + E", we could give the operators the following fixities:
+  
+  + is left-associative with precedence 1
+  * is right-associative with precedence 2
+
+However, the string "A + B + C + D" can't possibly parse as
+"(A + B) + (C + D)", because the + operator must be left-associative,
+right-associative, or non-associative, and none of those associativity choices
+choice will produce that parenthesization.
+
+Keep in mind that we're only dealing with syntax here - the meanings of the
+operators are completely irrelevant!
+
+In most cases there will be multiple valid answers, but you only have to give
+one.
+
+  a) "A * B + C * D" parses as "(A * B) + (C * D)"
+
+     { * must have higher precedence than +. }
+
+  b) "A & B ^ C | D | E" parses as "(A & (B ^ C)) | (D | E)"
+
+     { ^ must have higher precedence than &, which must have higher precedence
+       than |. | must be right-associative. }
+
+  c) "A % B @ C = D % E @ F" parses as "((A % B) @ C) = (D % (E @ F))"
+
+     { This is impossible. = must have the lowest precedence, but there are no
+       fixities that we can give to % and @ that make "A % B @ C" parse to
+       "(A % B) @ C" and also make "D % E @ F" parse to "D % (E @ F)". }
+
+  d) "A + B * C = A * B + A * C" parses as "((A + B) * C) = ((A * (B + A)) * C)"
+
+     { = must have the lowest precedence, followed by * and then +. * must be
+       left-associative. }
+
+
+4. (6 points)
+
+The week 3 slides define an unambiguous CFG for a small arithmetic language
+(where "n" is taken to be any natural number):
+
+  E --> P
+  E --> E + P
+  P --> A
+  P --> P * A
+  A --> (E)
+  A --> n
+
+In this grammar, both the + and the * operator are left-associative, and * has
+a higher precedence than +. This is enforced by the rules of the grammar, which
+divides arithmetic expressions into three categories:
+
+  - E represents expressions involving the + operator, only allowing other E
+    expressions on the right if they're within parentheses.
+
+  - P represents expressions involving the * operator, only allowing other P
+    expressions on the right or E expressions on either side if they're within
+    parentheses.
+
+  - A represents numeric literals or parenthesized expressions.
+
+Here are some example leftmost derivations using this CFG:
+
+  "E" -> "P" -> "A" -> "10"
+
+  "E" -> "E + P" -> "P + P" -> "A + P" -> "1 + P" -> "1 + A" -> "1 + 2"
+
+  "E" -> "E + P" -> "E + P + P" -> "P + P + P" -> "A + P + P" ->
+  "1 + P + P" -> "1 + A + P" -> "1 + (E) + P" -> "1 + (P) + P" ->
+  "1 + (P * A) + P" -> "1 + (A * A) + P" -> "1 + (2 * A) + P" ->
+  "1 + (2 * 3) + P" -> "1 + (2 * 3) + A" -> "1 + (2 * 3) + 4"
+
+Modify the CFG to add a new nonterminal X, representing expressions involving
+an infix exponent operator (^), so that the ^ operator is right-associative and
+has higher precedence than both + and *. The CFG should remain unambiguous, so
+that there is exactly one valid leftmost derivation that produces any given
+expression in the language. Give two example leftmost derivations that involve
+the ^ operator.
+
+  { This is not the only valid answer, but it's the one that most closely
+    follows the pattern established by the given rules. The precedence of the
+    operators is enforced by the order of dependencies between the rules - not
+    the order that we write them from top to bottom, but the fact that e.g. an
+    E can't go on the right hand side of a + sign unless it's in parentheses.
+    The associativity is enforced by the left-to-right ordering of the symbols
+    in the rules that introduce the operators: an E can't go on the right side
+    of a + without parentheses, but it _can_ go on the left side of a + without
+    parentheses, which makes it left-associative.
+
+    E --> P
+    E --> E + P
+    P --> X
+    P --> P * X
+    X --> A
+    X --> A ^ X
+    A --> (E)
+    A --> n }

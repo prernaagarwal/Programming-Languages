@@ -1,0 +1,125 @@
+CS 320 Principles of Programming Languages
+Homework 3
+Due Wednesday 11/14 before class (6:40pm)
+
+
+If you work on a computer, submit a TXT or PDF file as usual.
+
+
+If you do your work on paper, submit it as a PDF file or a PNG or JPEG image.
+Make sure your handwriting is readable!
+Make sure the image is clear!
+Make sure there aren't photo editor toolbars covering part of your image!
+(It's happened before.)
+
+
+1. (4 points each)
+
+Evaluate the following lambda calculus expressions using the call-by-value
+semantics from the Week 6 slides. (In short, arguments must be evaluated before
+function applications.)
+
+Show all the steps, including the substitutions.
+
+Every expression should reduce to an integer.
+
+The \ character is used in place of a lower-case Greek lambda.
+
+Vim tip: if you put your cursor over a left or right parenthesis in normal
+mode and type "v%" (without quotes), it'll highlight the text between that
+parenthesis and the matching one.
+
+  a) ((\x. (\y. x)) 1) (2 + 3)
+	=> ((\y. x)[1/x]) (2+3)
+	=> (\y. 1) (2+3)
+	=> (\y. 1) (5)
+	=> (1) [5/y]
+	=> 1
+
+  b) if ((\x. true) 5) then (6 + 7) else false
+	=> if (true[5/x]) then (6 + 7) else false
+	=> if true then (6 + 7) else false
+	=> 6 + 7
+	=> 13
+
+  c) (\f. (f (f 1))) (\x. x + 1)
+	=> (f (f 1)) [(\x. x + 1)/f]
+	=> (\x. x + 1)((\x. x + 1) 1)
+	=> (\x. x + 1)((x + 1)[1/x])
+	=> (\x. x + 1)(1 + 1)
+	=> (\x. x + 1)(2)
+	=> (x+1)[2/x]
+	=> 2 + 1
+	=> 3
+
+2. (4 points)
+
+Show that this lambda calculus expression diverges (never finishes evaluating)
+by reducing it until the evaluation process loops - i.e. until you take
+a reduction step that results in an expression you've already seen.
+
+  (\y. (y y)) ((\x. x) (\y. (y y)))
+
+
+Answer:
+
+
+(\y. (y y)) ((\x. x) (\y. (y y))) 
+=> (\y. (y y)) (x[(\y. (y y))/x])
+=> (\y. (y y)) (\y. (y y)) 
+=> (y y) [(\y. (y y))/y]
+=> (\y. (y y)) (\y. (y y))
+=> (y y) [(\y. (y y))/y]
+=> (\y. (y y)) (\y. (y y))
+=> ...
+
+Thus, this lambda calculus expression diverges
+
+
+3. (5 points)
+
+Describe in your own words how reduction order can affect whether or not a
+lambda calculus expression diverges during evaluation. (Look for the
+discussion of reduction order and divergence in the Week 6 slides.)
+
+
+Answer:
+
+
+In nondeterministic semantics, there might be a possibility that an expression
+can be reduced in several ways. So, the sequence of those reductions might give
+us different answers. Some sequences might terminate but on the other hand, 
+some sequences might diverge and never terminate even though a normal form 
+for that expression exist. Thus, it's important to define reduction order 
+to avoid divergence and obtain a normal form of the expression, if possible. 
+So, the two deterministic reduction orders are call-by-value (reduce arguments
+as much as possible before substituting them) and call-by-name (substitute 
+arguments first and evaluate them only when required).
+
+Let's take the same example from the slides, omega-combinator diverges. 
+
+omega = (\x. x x) (\x. x x)
+=>(x x) [(\x. x x)/x] => (\x. x x) (\x. x x)
+=>(x x) [(\x. x x)/x] => (\x. x x) (\x. x x) => ...
+
+Now let's take this expression: (\x y. y) omega z
+
+Here, omega-combinator appears as one of the arguments and if we do call-by-value 
+reduction order, then we'll try to reduce the arguments first. In this case, 
+the argument is omega-combinator which diverges and thus,the expression never 
+terminates as shown below:
+ 
+(\x y. y) omega z => (\x y. y) omega z => (\x y. y) omega z => ... (diverges!!!)
+
+However, if we decide to follow call-by-name reduction order,ie, by substitution 
+then omega-combinator gets eliminated and the expression terminates:
+
+(\x y. y) omega z => ((\y. y) [omega/x]) z => (\y. y) z => (y) [z/y] => z (terminates!!!)
+ 
+Thus, reduction order can affect whether a lambda calculus expression
+diverges or not during evaluation.
+
+
+
+
+Questions 4-7 are in hw3.lhs.
